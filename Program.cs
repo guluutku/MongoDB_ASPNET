@@ -1,15 +1,23 @@
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using MongoDB.Driver;
-using MongoDB.Bson;
-
-MongoClient client = new MongoClient("mongodb+srv://gunuluutku:g12345@laerning.dvlyypw.mongodb.net/?appName=Laerning");
-
-var playlistCollection = client.GetDatabase("sample_mflix").GetCollection<Playlist>("playlist");
-List<string> movieList = new List<string>();
-movieList.Add("1234");
-
-playlistCollection.InsertOne(new Playlist("nraboy", movieList));
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Add Custom MongoDB Services
+builder.Services.Configure<MongoDBSettings>(
+    builder.Configuration.GetSection(nameof(MongoDBSettings.ConnectionString))
+);
+
+builder.Services.AddSingleton<IMongoDBSettings>(
+    sp => sp.GetRequiredService<IOptions<MongoDBSettings>>().Value
+);
+
+builder.Services.AddSingleton<IMongoClient>(
+  s => new MongoClient(builder.Configuration.GetValue<string>("MongoDBSettings:ConnectionString"))
+);
+
+builder.Services.AddScoped<IStudentService, StudentService>();
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
