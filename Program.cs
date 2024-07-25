@@ -1,13 +1,13 @@
 using MongoDB.Driver;
 using MongoDB.Bson;
 
-MongoClient client = new MongoClient("mongodb+srv://gunuluutku:<password>@laerning.dvlyypw.mongodb.net/?appName=Laerning");
+MongoClient client = new MongoClient("mongodb+srv://gunuluutku:g12345@laerning.dvlyypw.mongodb.net/?appName=Laerning");
 
-List<string> databases = client.ListDatabaseNames().ToList();
+var playlistCollection = client.GetDatabase("sample_mflix").GetCollection<Playlist>("playlist");
+List<string> movieList = new List<string>();
+movieList.Add("1234");
 
-foreach(string database in databases) {
-    Console.WriteLine(database);
-}
+playlistCollection.InsertOne(new Playlist("nraboy", movieList));
 
 var builder = WebApplication.CreateBuilder(args);
 
